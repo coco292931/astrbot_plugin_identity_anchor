@@ -1,0 +1,6 @@
+name: "astrbot_plugin_identity_anchor"
+display_name: "身份锚 (identity_anchor)"
+desc: "可信身份注入插件：在每次 LLM 请求前，由平台注入真实发送者身份信息，防止伪造姐姐身份攻击。"
+version: "1.0.0"
+author: "coco"
+repo: "https://github.com/coco292931/astrbot_plugin_identity_anchor"
