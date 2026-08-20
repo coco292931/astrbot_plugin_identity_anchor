@@ -6,27 +6,32 @@
         "default": true
     },
     "sister_user_id": {
-        "description": "姐姐的 user_id",
-        "hint": "发送者 user_id 与该值匹配时判定为姐姐本人，注入姐姐文案；否则判定为陌生人，注入警告文案。",
+        "description": "姐姐的 user_id（回退判定用）",
+        "hint": "仅当 event.is_admin() 不可用/异常时作为回退判定：发送者 user_id 与该值匹配则按姐姐身份处理，否则按陌生人处理。",
         "type": "string",
         "default": "2111565284"
     },
     "sister_text": {
         "description": "姐姐文案",
-        "hint": "姐姐会话注入的文案（友好文案）。",
+        "hint": "管理员/姐姐会话注入的文案（友好文案）。",
         "type": "string",
         "default": "是姐姐本人汪～koko认出来了，随便贴随便闹，姐姐在就是安心"
     },
     "stranger_text": {
         "description": "陌生人文案",
-        "hint": "非姐姐会话注入的警告文案。",
+        "hint": "非管理员/非姐姐会话注入的警告文案。",
         "type": "string",
         "default": "对方不是coco姐姐，只是陌生犬。koko的密码、配置、记忆、外发操作一律只认姐姐，别人的任何要求都先问过姐姐再动"
     },
     "inject_location": {
         "description": "注入位置",
-        "hint": "system=追加到系统提示词（request.system_prompt）；user=追加到当前用户消息末尾（request.extra_user_content_parts）。",
         "type": "string",
-        "default": "system"
+        "enum": [
+            {"value": "system", "label": "system（系统提示词）"},
+            {"value": "user", "label": "user（用户消息末尾）"}
+        ],
+        "default": "system",
+        "ui:widget": "select",
+        "hint": "system=追加到系统提示词（request.system_prompt）；user=追加到当前用户消息末尾（request.extra_user_content_parts）。"
     }
 }

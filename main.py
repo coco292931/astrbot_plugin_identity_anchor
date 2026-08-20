@@ -66,11 +66,23 @@ class IdentityAnchorPlugin(Star):
 
             nickname = self._get_nickname(event)
 
-            # ---- 2. 身份判定：是否为姐姐 ----
-            sister_user_id = str(
-                self._cfg("sister_user_id", DEFAULT_SISTER_USER_ID) or ""
-            ).strip()
-            is_sister = bool(user_id) and (user_id == sister_user_id)
+            # ---- 2. 身份判定：优先 is_admin（管理员=姐姐身份），
+            #       is_admin 不可用/异常时回退 sister_user_id 比对 ----
+            is_sister = False
+            admin_determined = False
+            try:
+                if callable(getattr(event, "is_admin", None)):
+                    is_sister = bool(event.is_admin())
+                    admin_determined = True
+            except Exception as e:
+                logger.debug(f"[identity_anchor] is_admin 判定异常，回退 user_id: {e}")
+                admin_determined = False
+
+            if not admin_determined:
+                sister_user_id = str(
+                    self._cfg("sister_user_id", DEFAULT_SISTER_USER_ID) or ""
+                ).strip()
+                is_sister = bool(user_id) and (user_id == sister_user_id)
 
             if is_sister:
                 relation = "是姐姐本人"
