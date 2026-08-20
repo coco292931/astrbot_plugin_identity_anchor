@@ -1,0 +1,2 @@
+# astrbot_plugin_identity_anchor
+astrbot可信身份注入插件
