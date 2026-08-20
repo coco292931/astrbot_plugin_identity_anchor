@@ -485,6 +485,41 @@ check(
 )
 check("注入块追加在其后", req.system_prompt.find("你是老姐的AI助手。") < req.system_prompt.find("【可信身份】"))
 
+# ---- 2.15 system 注入：[用户历史记忆] 存在时，【可信身份】在其之后 ----
+print("\n-- 2.15 system 注入：[用户历史记忆] 存在时，【可信身份】在记忆块之后 --")
+plugin = make_plugin()
+memory_block = "[用户历史记忆]\n- 喜欢猫\n- 爱喝奶茶\n"
+req = MockRequest(system_prompt=f"你是老姐的AI助手。\n{memory_block}")
+run_hook(plugin, "10086", nickname="骗子", role="member", request=req)
+check(
+    "[用户历史记忆] 标记在 system_prompt 中保留",
+    "[用户历史记忆]" in req.system_prompt,
+)
+check(
+    "【可信身份】在 [用户历史记忆] 之后",
+    req.system_prompt.find("[用户历史记忆]") < req.system_prompt.find("【可信身份】"),
+    f"memory_pos={req.system_prompt.find('[用户历史记忆]')}, block_pos={req.system_prompt.find('【可信身份】')}",
+)
+check(
+    "原 system_prompt 内容保留",
+    req.system_prompt.startswith("你是老姐的AI助手。"),
+)
+
+# ---- 2.16 system 注入：无 [用户历史记忆] 时末尾追加 ----
+print("\n-- 2.16 system 注入：无 [用户历史记忆] 标记时末尾追加 --")
+plugin = make_plugin()
+req = MockRequest(system_prompt="你是老姐的AI助手。\n一些其他内容。")
+run_hook(plugin, "10086", nickname="骗子", role="member", request=req)
+check(
+    "无记忆标记时注入块追加到末尾",
+    req.system_prompt.endswith(f"{STRANGER_TEXT}\n"),
+    f"末尾: ...{req.system_prompt[-60:]}",
+)
+check(
+    "原 system_prompt 内容保留",
+    req.system_prompt.startswith("你是老姐的AI助手。"),
+)
+
 # =====================================================================
 # 测试 3：目录结构（AstrBot 加载要求）
 # =====================================================================
